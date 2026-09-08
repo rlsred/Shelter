@@ -1,0 +1,55 @@
+name: Build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag, for example v1.9.1-lane.1
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.SHELTER_STORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.SHELTER_KEY_PASSWORD }}
+      SHELTER_KEYSTORE_BASE64: ${{ secrets.SHELTER_KEYSTORE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Build and sign APK
+        run: |
+          set -euo pipefail
+          key="$RUNNER_TEMP/shelter-release.p12"
+          printf '%s' "$SHELTER_KEYSTORE_BASE64" | base64 --decode > "$key"
+          ./gradlew assembleRelease
+          unsigned=app/build/outputs/apk/release/app-release-unsigned.apk
+          apk="Shelter-${{ inputs.tag }}.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -f -p 4 "$unsigned" "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
+            --ks "$key" --ks-type PKCS12 --ks-key-alias shelter \
+            --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEY_PASSWORD \
+            --out "$apk" "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ inputs.tag }}" "Shelter-${{ inputs.tag }}.apk" --title "${{ inputs.tag }}" --generate-notes

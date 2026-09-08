@@ -40,7 +40,9 @@ jobs:
           set -euo pipefail
           key="$RUNNER_TEMP/shelter-release.p12"
           printf '%s' "$SHELTER_KEYSTORE_BASE64" | base64 --decode > "$key"
-          git tag -fa "${{ inputs.tag }}" -m "${{ inputs.tag }}"
+          git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            tag -fa "${{ inputs.tag }}" -m "${{ inputs.tag }}"
           ./gradlew assembleRelease
           unsigned=app/build/outputs/apk/release/app-release-unsigned.apk
           apk="Shelter-${{ inputs.tag }}.apk"

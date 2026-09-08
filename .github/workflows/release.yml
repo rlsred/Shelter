@@ -56,4 +56,6 @@ jobs:
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ inputs.tag }}" "Shelter-${{ inputs.tag }}.apk" --title "${{ inputs.tag }}" --generate-notes
+        run: |
+          git tag -d "${{ inputs.tag }}"
+          gh release create "${{ inputs.tag }}" "Shelter-${{ inputs.tag }}.apk" --target "$GITHUB_SHA" --title "${{ inputs.tag }}" --generate-notes

@@ -205,9 +205,11 @@ public class Utility {
 
         if (SettingsManager.getInstance().getCrossProfilePhotoPickerEnabled()) {
             // Allow the system photo picker to show work-profile media to personal apps.
+            IntentFilter photoPickerFilter = new IntentFilter(MediaStore.ACTION_PICK_IMAGES);
+            photoPickerFilter.addCategory(Intent.CATEGORY_DEFAULT);
             manager.addCrossProfileIntentFilter(
                     adminComponent,
-                    new IntentFilter(MediaStore.ACTION_PICK_IMAGES),
+                    photoPickerFilter,
                     DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
         }
 

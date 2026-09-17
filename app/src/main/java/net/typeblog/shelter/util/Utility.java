@@ -210,7 +210,7 @@ public class Utility {
             manager.addCrossProfileIntentFilter(
                     adminComponent,
                     photoPickerFilter,
-                    DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+                    DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
 
             IntentFilter documentPickerFilter = new IntentFilter();
             documentPickerFilter.addAction(Intent.ACTION_GET_CONTENT);
@@ -225,7 +225,7 @@ public class Utility {
             manager.addCrossProfileIntentFilter(
                     adminComponent,
                     documentPickerFilter,
-                    DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+                    DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
         }
 
         // Browser intents are allowed from work profile to parent

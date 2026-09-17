@@ -202,7 +202,15 @@ public class Utility {
                 adminComponent,
                 actionSendFilter,
                 DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
-        
+
+        if (SettingsManager.getInstance().getCrossProfilePhotoPickerEnabled()) {
+            // Allow the system photo picker to show work-profile media to personal apps.
+            manager.addCrossProfileIntentFilter(
+                    adminComponent,
+                    new IntentFilter(MediaStore.ACTION_PICK_IMAGES),
+                    DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+        }
+
         // Browser intents are allowed from work profile to parent
         IntentFilter browsableIntentFilter = new IntentFilter(Intent.ACTION_VIEW);
         browsableIntentFilter.addCategory(Intent.CATEGORY_BROWSABLE);

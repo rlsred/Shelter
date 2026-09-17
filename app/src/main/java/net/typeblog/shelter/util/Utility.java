@@ -211,6 +211,19 @@ public class Utility {
                     adminComponent,
                     photoPickerFilter,
                     DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+
+            IntentFilter getContentFilter = new IntentFilter(Intent.ACTION_GET_CONTENT);
+            getContentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+            getContentFilter.addCategory(Intent.CATEGORY_OPENABLE);
+            try {
+                getContentFilter.addDataType("image/*");
+            } catch (IntentFilter.MalformedMimeTypeException ignored) {
+                // Constant MIME type.
+            }
+            manager.addCrossProfileIntentFilter(
+                    adminComponent,
+                    getContentFilter,
+                    DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
         }
 
         // Browser intents are allowed from work profile to parent
